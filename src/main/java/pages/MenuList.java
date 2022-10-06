@@ -23,6 +23,6 @@ public class MenuList extends MainPage{
         WebElement clickRandom=pizzasList.get(pickRandom());
         String pizzaName = clickRandom.findElement(By.tagName("div")).getText();
         clickRandom.click();
-        return pizzaName;
+        return pizzaName.replace("\\W","");
     }
 }

@@ -8,9 +8,14 @@ import java.util.List;
 public class CartPage extends AbstractPage{
     public List<WebElement> pizzasList;
     public void setPizzasList(){
-        pizzasList=driver.findElements(By.xpath("//*[@data-testid='cart__list']/article"));
+        pizzasList=driver.findElements(By.xpath("//*[@data-testid='cart__list']/article"));//список позиций внутри корзины
     }
     public String getName(int order){
-        return pizzasList.get(order).findElement(By.tagName("h3")).getText();
+        return pizzasList.get(order).findElement(By.tagName("h3")).getText();//получаем имя из позиции
+    }
+    public String getPrice(int order){
+        String price=pizzasList.get(order).getText();
+        price.replaceAll("\\D","");//оставляем только число
+        return price;
     }
 }
