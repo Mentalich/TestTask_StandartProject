@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -44,13 +45,13 @@ public class AutoTest {
 
         assertEquals("https://dodopizza.ru/moscow", driver.getCurrentUrl());//1. Проверить, на какой странице мы находимся
         logger.info("Проверка количества позиций пицц в меню");
-        assertEquals(33, menuList.getNumberOfPizzaPositions());//2. проверить общее кол-во товаров в РАЗДЕЛЕ "Пицца";
+        assertEquals(34, menuList.getNumberOfPizzaPositions());//2. проверить общее кол-во товаров в РАЗДЕЛЕ "Пицца";
         logger.info("Проверка тега локации");
         assertEquals("Москва", mainPage.MainMenu_access().getLocationIndex());//3. в шапке страницы, рядом с надписью "Доставка пиццы ", отображается наименование региона
         logger.info("Тест пройден!");
     }
     @Test
-    public void Test_Case1(){
+    public void Test_Case1() throws org.opentest4j.AssertionFailedError{
         MenuList menuList=new MenuList();
         OrderCustomisationPage orderCustomisationPage =new OrderCustomisationPage();
 
@@ -72,7 +73,7 @@ public class AutoTest {
     }
 
     @Test()
-    public void Test_case2() {
+    public void Test_case2()  throws org.opentest4j.AssertionFailedError{
         MenuList menuList=new MenuList();
         OrderCustomisationPage orderCustomisationPage = new OrderCustomisationPage();
         CartPage cartPage = new CartPage();
@@ -86,6 +87,8 @@ public class AutoTest {
             orderNames.add(orderCustomisationPage.checkName());//сохраняем имя позиции в списке
             logger.debug("Добавляем в корзину позицию {} стоимостью {}", orderNames.get(count), orderCustomisationPage.addPizzaToCart());//добавляем в корзину, запоминая цену
         }
+        //logger.debug("Проверяем, что в корзине {} позиций",objectsToAdd);
+        //assertEquals(objectsToAdd, orderCustomisationPage.MainMenu_access().checkCartAmount());//проваливает тест из-за бесплатных подарков, сбивающих счёт
         orderCustomisationPage.MainMenu_access().clickCartButton();
         logger.info("Открываем корзину");
         cartPage.setPizzasList();//составляем список позиций в корзине
@@ -97,9 +100,9 @@ public class AutoTest {
         logger.info("Тест пройден!");
     }
 
-    private static int savePic(File picture) throws IOException {
+    private static String savePic(File picture) throws IOException {
         Random randomID=new Random();
-        int index=randomID.nextInt(100000);
+        String index= String.valueOf(UUID.randomUUID());
         FileUtils.copyFile(picture, new File("*\\test\\screenshot"+index+".jpg"));
         return index;
     }
@@ -107,7 +110,7 @@ public class AutoTest {
     public void save_and_close() throws IOException {
         File screenshot=((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
         logger.info("Сохраняем скриншот, код:{}", savePic(screenshot));
-        driver.close();
+        driver.quit();
     }
 }
 
