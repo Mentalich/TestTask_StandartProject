@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,7 +56,7 @@ public class AutoTest {
 
 
         String name_expected = menuList.clickOnRandom();//Нажимаем на случайную позицию, сохраняя имя позиции
-        logger.info("Выбираем случайную позицию, ",name_expected);
+        logger.info("Выбираем случайную позицию, {}",name_expected);
         String name_actual = orderCustomisationPage.checkName();//сохраняем имя позиции в виджете
         logger.info("Выбираем маленькую пиццу");
         int price_before = orderCustomisationPage.customiseSize(Size.SMALL);
@@ -80,18 +79,24 @@ public class AutoTest {
 
         List<String>orderNames=new ArrayList<String>();//список имён добавляемых позиций
         int objectsToAdd=5;//Количество позиций, добавляемых в корзину, согласно тест-кейсу
-        logger.debug("Добавляем {} позиций", objectsToAdd);
+        int sumActual=0;
+        logger.info("Добавляем {} позиций", objectsToAdd);
 
         for (int count=0; count<objectsToAdd;count++){
             menuList.clickOnRandom();//нажимаем на случайную позицию
             orderNames.add(orderCustomisationPage.checkName());//сохраняем имя позиции в списке
-            logger.debug("Добавляем в корзину позицию {} стоимостью {}", orderNames.get(count), orderCustomisationPage.addPizzaToCart());//добавляем в корзину, запоминая цену
+            int price=orderCustomisationPage.addPizzaToCart();
+            logger.info("Добавляем в корзину позицию {} стоимостью {}", orderNames.get(count), price);//добавляем в корзину, запоминая цену
+            sumActual=sumActual+price;
         }
-        //logger.debug("Проверяем, что в корзине {} позиций",objectsToAdd);
-        //assertEquals(objectsToAdd, orderCustomisationPage.MainMenu_access().checkCartAmount());//проваливает тест из-за бесплатных подарков, сбивающих счёт
+        //logger.info("Проверяем, что в корзине {} позиций",objectsToAdd);
+        //assertEquals(objectsToAdd, Integer.valueOf(orderCustomisationPage.MainMenu_access().checkCartAmount()));//проваливает тест из-за бесплатных подарков, сбивающих счёт
         orderCustomisationPage.MainMenu_access().clickCartButton();
         logger.info("Открываем корзину");
         cartPage.setPizzasList();//составляем список позиций в корзине
+        //соотносим суммы
+        logger.info("Проверяем сумму заказа");
+        assertEquals(cartPage.getSummary(), sumActual);
         logger.info("Читаем список позиций в корзине");
         //соотносим имена
         for (int count=0; count<objectsToAdd;count++){
@@ -101,16 +106,18 @@ public class AutoTest {
     }
 
     private static String savePic(File picture) throws IOException {
-        Random randomID=new Random();
         String index= String.valueOf(UUID.randomUUID());
-        FileUtils.copyFile(picture, new File("*\\test\\screenshot"+index+".jpg"));
+        FileUtils.copyFile(picture, new File(".\\TestTask_screenshots\\screenshot_"+index+".jpg"));
         return index;
     }
     @AfterEach
     public void save_and_close() throws IOException {
+        logger.info("Завершение...");
         File screenshot=((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-        logger.info("Сохраняем скриншот, код:{}", savePic(screenshot));
-        driver.quit();
+        String id = savePic(screenshot);
+        logger.info("Сохраняем скриншот, код:{}", id);
+        driver.close();
+        screenshot.deleteOnExit();
     }
 }
 

@@ -18,4 +18,9 @@ public class CartPage extends AbstractPage{
         price.replaceAll("\\D","");//оставляем только число
         return price;
     }
+    public int getSummary(){
+        WebElement sumLine=driver.findElement(By.xpath("/html/body/div[4]/div/div[2]/div/div/div[1]/main/div/div[1]/div"));
+        String summary = sumLine.getText();
+        return Integer.valueOf(summary.replaceAll("(\\D*)",""));
+    }
 }
